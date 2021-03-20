@@ -1,0 +1,9 @@
+[Unit]
+Description=Treadmill timer for ran daily at 4am
+
+[Timer]
+OnCalendar=*-*-* 4:00:00
+Persistent=false
+
+[Install]
+WantedBy=timers.target

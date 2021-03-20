@@ -1,0 +1,7 @@
+[Unit]
+Description=Treadmill Usage Monitoring Sensor
+
+[Service]
+ExecStart=/usr/src/treadmill/treadmill
+Type=simple
+
