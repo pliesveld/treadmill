@@ -123,32 +123,32 @@ treadmill/fast:
 	$(MAKE) -f CMakeFiles/treadmill.dir/build.make CMakeFiles/treadmill.dir/build
 .PHONY : treadmill/fast
 
-ultrasonicRangingTreadmill.o: ultrasonicRangingTreadmill.c.o
+src/ultrasonicRangingTreadmill.o: src/ultrasonicRangingTreadmill.cpp.o
 
-.PHONY : ultrasonicRangingTreadmill.o
+.PHONY : src/ultrasonicRangingTreadmill.o
 
 # target to build an object file
-ultrasonicRangingTreadmill.c.o:
-	$(MAKE) -f CMakeFiles/treadmill.dir/build.make CMakeFiles/treadmill.dir/ultrasonicRangingTreadmill.c.o
-.PHONY : ultrasonicRangingTreadmill.c.o
+src/ultrasonicRangingTreadmill.cpp.o:
+	$(MAKE) -f CMakeFiles/treadmill.dir/build.make CMakeFiles/treadmill.dir/src/ultrasonicRangingTreadmill.cpp.o
+.PHONY : src/ultrasonicRangingTreadmill.cpp.o
 
-ultrasonicRangingTreadmill.i: ultrasonicRangingTreadmill.c.i
+src/ultrasonicRangingTreadmill.i: src/ultrasonicRangingTreadmill.cpp.i
 
-.PHONY : ultrasonicRangingTreadmill.i
+.PHONY : src/ultrasonicRangingTreadmill.i
 
 # target to preprocess a source file
-ultrasonicRangingTreadmill.c.i:
-	$(MAKE) -f CMakeFiles/treadmill.dir/build.make CMakeFiles/treadmill.dir/ultrasonicRangingTreadmill.c.i
-.PHONY : ultrasonicRangingTreadmill.c.i
+src/ultrasonicRangingTreadmill.cpp.i:
+	$(MAKE) -f CMakeFiles/treadmill.dir/build.make CMakeFiles/treadmill.dir/src/ultrasonicRangingTreadmill.cpp.i
+.PHONY : src/ultrasonicRangingTreadmill.cpp.i
 
-ultrasonicRangingTreadmill.s: ultrasonicRangingTreadmill.c.s
+src/ultrasonicRangingTreadmill.s: src/ultrasonicRangingTreadmill.cpp.s
 
-.PHONY : ultrasonicRangingTreadmill.s
+.PHONY : src/ultrasonicRangingTreadmill.s
 
 # target to generate assembly for a file
-ultrasonicRangingTreadmill.c.s:
-	$(MAKE) -f CMakeFiles/treadmill.dir/build.make CMakeFiles/treadmill.dir/ultrasonicRangingTreadmill.c.s
-.PHONY : ultrasonicRangingTreadmill.c.s
+src/ultrasonicRangingTreadmill.cpp.s:
+	$(MAKE) -f CMakeFiles/treadmill.dir/build.make CMakeFiles/treadmill.dir/src/ultrasonicRangingTreadmill.cpp.s
+.PHONY : src/ultrasonicRangingTreadmill.cpp.s
 
 # Help Target
 help:
@@ -159,9 +159,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... treadmill"
 	@echo "... edit_cache"
-	@echo "... ultrasonicRangingTreadmill.o"
-	@echo "... ultrasonicRangingTreadmill.i"
-	@echo "... ultrasonicRangingTreadmill.s"
+	@echo "... src/ultrasonicRangingTreadmill.o"
+	@echo "... src/ultrasonicRangingTreadmill.i"
+	@echo "... src/ultrasonicRangingTreadmill.s"
 .PHONY : help
 
 

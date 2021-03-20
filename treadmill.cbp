@@ -84,7 +84,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/tmp/tmp.iF1LbkZ9jD/ultrasonicRangingTreadmill.c">
+		<Unit filename="/tmp/tmp.iF1LbkZ9jD/src/ultrasonicRangingTreadmill.cpp">
 			<Option target="treadmill"/>
 		</Unit>
 		<Unit filename="/tmp/tmp.iF1LbkZ9jD/CMakeLists.txt">

@@ -19,7 +19,30 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <stdlib.h>
-#include "signal.h"
+#include <signal.h>
+#include <chrono>
+
+#include <cstring>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+using std::vector;
+using std::string;
+using std::cout;
+using std::endl;
+
+vector<string> dns_lookup(const string &host_name, int ipv=4);
+
+using namespace std::chrono;
+
+
+#include "../include/influxdb.hpp"
+
 
 /*
  * The following pins use the wiriingPi order numbering of the raspberry Pi. See README.md for more details.
@@ -33,7 +56,8 @@
 //#define MAX_TIMEOUT MAX_DISTANCE*60 // calculate timeout according to the maximum measured distance
 #define MAX_TIMEOUT 100000L
 
-
+void sensor_main_loop();
+unsigned long long int timestamp_now();
 static void onterm(int s)
 {
 	printf("onterm\n");
@@ -52,6 +76,47 @@ static void register_signal_handlers() {
 	signal(SIGINT, onterm);
 	signal(SIGQUIT, onterm);
 	atexit(onexit);
+}
+
+vector<string> dns_lookup(const string &host_name, int ipv)
+{
+	vector<string> output;
+
+	struct addrinfo hints, *res, *p;
+	int status, ai_family;
+	char ip_address[INET6_ADDRSTRLEN];
+
+	ai_family = ipv==6 ? AF_INET6 : AF_INET; //v4 vs v6?
+	ai_family = ipv==0 ? AF_UNSPEC : ai_family; // AF_UNSPEC (any), or chosen
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = ai_family;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if ((status = getaddrinfo(host_name.c_str(), NULL, &hints, &res)) != 0) {
+		//cerr << "getaddrinfo: "<< gai_strerror(status) << endl;
+		return output;
+	}
+
+	//cout << "DNS Lookup: " << host_name << " ipv:" << ipv << endl;
+
+	for(p = res;p != NULL; p = p->ai_next) {
+		void *addr;
+		if (p->ai_family == AF_INET) { // IPv4
+			struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+			addr = &(ipv4->sin_addr);
+		} else { // IPv6
+			struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+			addr = &(ipv6->sin6_addr);
+		}
+
+		// convert the IP to a string
+		inet_ntop(p->ai_family, addr, ip_address, sizeof ip_address);
+		output.push_back(ip_address);
+	}
+
+	freeaddrinfo(res); // free the linked list
+
+	return output;
 }
 
 /*
@@ -114,11 +179,33 @@ float getSonar()
 	return distance;
 }
 
+influxdb_cpp::server_info si(dns_lookup("bigpi3").at(0), 8086, "test_db", "", "", "ms");
+
 int main()
 {
 	printf("Program is starting ... \n");
 	register_signal_handlers();
-	
+
+	sensor_main_loop();
+	return 1;
+}
+
+void create_database() {
+// CREATE DATABASE test_db
+// CREATE RETENTION POLICY "24hours" ON "test_db" DURATION 24h REPLICATION 1 DEFAULT
+}
+
+
+unsigned long long int timestamp_now()
+{
+
+	auto a1 = std::chrono::system_clock::now().time_since_epoch();
+	auto a2 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() * 1000;
+	return a2;
+
+}
+void sensor_main_loop()
+{
 	wiringPiSetup();
 
 	pinMode(LED_PIN_NO, OUTPUT); //Set the pin mode of led
@@ -129,10 +216,21 @@ int main()
 	int desired = LOW;
 	int count = 0;
 
+	int i = 0;
 
 	while (1) {
 		float distance = getSonar();
 		printf("The distance to my fat ass: %.2f cm\n", distance);
+
+        int resp = influxdb_cpp::builder()
+            .meas("body")
+            .tag("position", "center")
+            .field("distance", distance)
+            .timestamp(timestamp_now())
+            .post_http(si);
+
+        printf("resp = %d\n",resp);
+
 
 		if (distance >= 0.0001 && distance <= 160.000) {
 			prev = HIGH;
@@ -155,5 +253,4 @@ int main()
 
 		delay(1000);
 	}
-	return 1;
 }
