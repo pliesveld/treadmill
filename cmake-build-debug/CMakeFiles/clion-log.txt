@@ -1,0 +1,2 @@
+Cannot generate 'Debug' into /home/patrick/scratchpad/treadmill/cmake-build-debug
+Only in-source generation will be performed.

@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/patrick/scratchpad/treadmill/ultrasonicRangingTreadmill.c
+wiringPi.h
+-
+stdio.h
+-
+sys/time.h
+-
+
