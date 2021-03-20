@@ -60,7 +60,7 @@ int main(){
 		count = 0;
 	}
 
-	if(count == 3) {
+	if(count == 6) {
 		desired = prev;
 		printf("Desired = %d\n", desired);
 	}
