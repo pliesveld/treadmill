@@ -58,6 +58,7 @@ using namespace std::chrono;
 
 void sensor_main_loop();
 unsigned long long int timestamp_now();
+void record_sample(float distance);
 static void onterm(int s)
 {
 	printf("onterm\n");
@@ -204,6 +205,12 @@ unsigned long long int timestamp_now()
 	return a2;
 
 }
+
+/*
+ * main loop triggers the HC-SR04's sonar scan, and measures the distance.
+ * HC-SR04 occasionally returns a distance value that is a false positive.
+ * Therefore, the main loop checks for 6 readings sequentially before toggling the state.
+ */
 void sensor_main_loop()
 {
 	wiringPiSetup();
@@ -212,45 +219,50 @@ void sensor_main_loop()
 	pinMode(HC_SR04_TRIGGER_PIN_NO, OUTPUT); //Set the pin mode of the trigger pin
 	pinMode(HC_SR04_ECHO_PIN_NO, INPUT);  //Set the pin mode of the echo pin
 
-	int prev = LOW;
-	int desired = LOW;
+	int sampled_level = LOW;
+	int current_level = LOW;
 	int count = 0;
 
 	int i = 0;
 
 	while (1) {
 		float distance = getSonar();
-		printf("The distance to my fat ass: %.2f cm\n", distance);
-
-        int resp = influxdb_cpp::builder()
-            .meas("body")
-            .tag("position", "center")
-            .field("distance", distance)
-            .timestamp(timestamp_now())
-            .post_http(si);
-
-        printf("resp = %d\n",resp);
-
+		printf("The distance to: %.2f cm\n", distance);
 
 		if (distance >= 0.0001 && distance <= 160.000) {
-			prev = HIGH;
+			sampled_level = HIGH;
 		} else {
-			prev = LOW;
+			sampled_level = LOW;
 		}
 
-		if (desired != prev) {
+		if (current_level != sampled_level) {
 			count++;
 		} else {
 			count = 0;
 		}
 
 		if (count == 6) {
-			desired = prev;
-			printf("Desired = %d\n", desired);
+			current_level = sampled_level;
+			count = 0;
+			printf("current_level = %d\n", current_level);
 		}
 
-		digitalWrite(LED_PIN_NO, desired);  //Make GPIO output HIGH level
+		digitalWrite(LED_PIN_NO, current_level);  //Make GPIO output HIGH level
+
+		if(current_level == HIGH) {
+			record_sample(distance);
+		}
 
 		delay(1000);
 	}
+}
+void record_sample(float distance)
+{
+	int resp = influxdb_cpp::builder()
+		.meas("body")
+		.tag("position", "center")
+		.field("distance", distance)
+		.timestamp(timestamp_now())
+		.post_http(si);
+	printf("resp = %d\n",resp);
 }
